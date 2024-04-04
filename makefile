@@ -8,13 +8,13 @@ new_py_environment:
 	conda env create --file infrastructure/environment.yml
 
 update_py_environment:
-	conda env update --name boardgame_copilot --file environment.yml
+	conda env update --name ml_project_template --file environment.yml
 
 export_py_environment:
-	conda env export --name boardgame_copilot > environment.yml
+	conda env export --name ml_project_template > environment.yml
 	
 remove_py_environment:
-	conda env remove --name boardgame_copilot
+	conda env remove --name ml_project_template
 
 isort:
 	isort . -l 130

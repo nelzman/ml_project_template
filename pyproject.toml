@@ -1,0 +1,19 @@
+[build-system]
+requires = ["poetry>=1.1.0"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "Machine Learning Project Template"
+version = "0.1.0"
+description = "Template repository for Machine Learning Projects"
+authors = ["Michael Nelz <michael.nelz@nelo-intelligence.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+# Add your development dependencies here
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
