@@ -71,30 +71,6 @@ class TrainingUtils:
         return measurement_data
 
     @staticmethod
-    def check_for_parameters_pre_selection(config: dict, segment: str, step: str = "pre_training") -> list:
-        """
-        :param config: config for training
-        :param segment: segment/hotspot to check the parameters for
-        :param step: for which step to choose the parameters
-        :return: Dataframe
-
-        - check for training process-parameters
-        - for pre_training, general process parameters are given independant from segment to filter pre training
-        - for on_training, segment-specific process parameters are given to train on
-        """
-        assert step == "pre_training" or step == "on_training"
-        if step == "pre_training":
-            _pre_selected_process_parameters = config.get("training").get("pre_selected_process_parameters", None)
-
-        elif step == "on_training":  # if there is any pre selection of parameters for that SEGMENT use it
-            _pre_selected_process_parameters = (
-                config.get("training").get(segment, {}).get("pre_selected_process_parameters", None)
-            )
-        else:
-            raise ValueError("Value for step should be one of ['pre_training','on_training']")
-        return _pre_selected_process_parameters
-
-    @staticmethod
     def extrapolate_rbls(rbls: list) -> list:
         """
         :param rbls: list with raw brick lengths (rbls)
@@ -160,26 +136,3 @@ class TrainingUtils:
 
         module = importlib.import_module(algorithm_module_str)
         return getattr(module, algorithm)
-
-    @staticmethod
-    def replace_feature_content_based_on_zscore(data: pd.DataFrame, score: int = 2, replace_with: str = "nan") -> pd.DataFrame:
-        """
-        :param data: features to train on
-        :param score: threshold for deleting data
-        :param replace_with: method for replacement, median for feature median, nan for leaving it blank
-        :return: Dataframes for features and target
-
-        - apply z-score on data
-        - replace data that is too far away from the center of the z-score
-        """
-        for col in data.columns:
-            if col not in ["Lower Vessel Life"]:  # todo: not check more features
-                z_scores = stats.zscore(data[col], nan_policy="omit")
-                abs_z_scores = np.abs(z_scores)
-                print("ZSCORES")
-                print(abs_z_scores)
-                replaced_entries = abs_z_scores > score
-                data.loc[replaced_entries, col] = np.nan
-                if replace_with == "median":
-                    data.loc[replaced_entries, col] = data[col].median()
-        return data

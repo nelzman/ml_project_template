@@ -13,7 +13,6 @@ class TrainingPreparation:
     def construct_training_data(self, data: pd.DataFrame, columns: list = []) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, list]:
         """
         :param datasets: datasets to construct train-test data
-        :param segment: segment to get training and testing data
         :return: a tuple with (training_x, training_y, test_x, test_y, preselected columns, cross-validation-settings)
 
         - split the data into training and test-data
@@ -36,7 +35,7 @@ class TrainingPreparation:
             - both given: filter preprocessed data for train-campaigns and train on that,
               then evaluate on data filtered for test-campaign
             - when test is given and attribute the "test_on_last_heat_only: true" on config,
-                we test on the last heat only! UsEcAsE: Ideal for accuracy check on real data only. RH's only have a Post Mortem
+                we test on the last heat only! UsEcAsE: Ideal for accuracy check on real data only.
         - then split features and target from training and testing data
         """
 
@@ -55,7 +54,6 @@ class TrainingPreparation:
         """
         :param x_train: training-dataframe with features
         :param x_test: test-dataframe with features
-        :param segment: segment for the pre_selected_columns
         :return: training and testing dataframe and the preselected columns
 
         - get dataframes with preselected columns

@@ -23,6 +23,7 @@ class Preprocessor:
         """
         data = self._fill_nan_values(data)
         data = self._remove_outliers(data)
+        data = self._encode_categorical_features(data)
         return data
     
     def _fill_nan_values(self, data: pd.DataFrame) -> pd.DataFrame:
@@ -49,3 +50,17 @@ class Preprocessor:
         abs_z_scores = np.abs(z_scores)
         filtered_entries = (abs_z_scores < 3).all(axis=1)
         return data[filtered_entries]
+    
+    def _encode_categorical_features(self, data: pd.DataFrame) -> pd.DataFrame:
+        """
+        :param data: dataset to preprocess
+        :return: preprocessed dataset
+
+        - encode categorical features
+        """
+        data = pd.get_dummies(data)
+        #data2 = data.copy()
+        #for col in data.columns:
+        #    if col in data.select_dtypes(include=object).columns:
+        #        data2[col] = [True if value == "yes" else False for value in data[col]]
+        return data

@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     # run preprocessing:
 
-    data = pd.read_csv("artifacts/data/iris.csv")
+    data = pd.read_csv("artifacts/data/Housing.csv")
     logger.info("Run Preprocess!")
     preprocess_runner = Preprocessor(
         config=config,

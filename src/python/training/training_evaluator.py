@@ -11,33 +11,32 @@ class TrainingEvaluator:
 
     def calculate_training_results(
         self,
-        x: pd.DataFrame,
-        y: pd.Series,
+        x_train: pd.DataFrame,
+        y_train: pd.Series,
         x_test: pd.DataFrame,
         y_test: pd.Series,
     ) -> dict:
         """
-        :param x: training dataframe with feature-variables
-        :param y: training list with the target-variable
+        :param x_train: training dataframe with feature-variables
+        :param y_train: training list with the target-variable
         :param x_test: testing dataframe with feature-variables
         :param y_test: testing list with the target-variable
-        :param segment: segment for plotting
         :return: dictionary with training results
 
         - calculates results for the models
         """        
 
         # fill training_results:
-        self._training_results_dict = {data: {"x": x, "y": y, "x_test": x_test, "y_test": y_test}}
+        self._training_results_dict = {"data": {"x_train": x_train, "y_train": y_train, "x_test": x_test, "y_test": y_test}}
         self._training_results_dict["algorithm_names"] = list(self.model_tree.keys())
         (
             self._training_results_dict["cooks_distance_data"],
             self._training_results_dict["cooks_distance"],
-        ) = self._calculate_cooks_distance(x, y)
+        ) = self._calculate_cooks_distance(x_train, y_train)
 
         # correlation:
-        data = x.copy()
-        data["target"] = y
+        data = x_train.copy()
+        data["target"] = y_train
         data_corr = data.corr()[:-1]
         data_corr.fillna(0, inplace=True)
         data_corr.index.set_names(["column_name"], inplace=True)
@@ -50,15 +49,15 @@ class TrainingEvaluator:
             self._training_results_dict[model_name] = {}
 
             # calculate predicted y:
-            self._training_results_dict[model_name]["y_pred"] = model_attr.predict(x)
+            self._training_results_dict[model_name]["y_pred"] = model_attr.predict(x_train)
             self._training_results_dict[model_name]["y_test_pred"] = model_attr.predict(x_test)
 
             # calculate residuals:
-            self._training_results_dict[model_name]["y_residuals"] = (
-                self._training_results_dict["y"] - self._training_results_dict[model_name]["y_pred"]
+            self._training_results_dict[model_name]["y_train_residuals"] = (
+                self._training_results_dict["data"]["y_train"] - self._training_results_dict[model_name]["y_pred"]
             )
             self._training_results_dict[model_name]["y_test_residuals"] = (
-                self._training_results_dict["y_test"] - self._training_results_dict[model_name]["y_test_pred"]
+                self._training_results_dict["data"]["y_test"] - self._training_results_dict[model_name]["y_test_pred"]
             )
 
             # calculate training results:
@@ -90,14 +89,13 @@ class TrainingEvaluator:
         return cd_data, cd_model.get_influence().cooks_distance
 
     @staticmethod
-    def get_best_model(config: dict, model_tree: dict, vessel_number: int) -> dict:
+    def get_best_model(config: dict, model_tree: dict) -> dict:
         """
         :param config: customer config
-        :param model_tree: tree of trained models for different hotspots
-        :param vessel_number: currently processed vessel id
-        :return: dictionary of best model for every hotspot with best score
+        :param model_tree: tree of trained models
+        :return: dictionary of best model with best score
 
-        - gets the best model for every hotspot
+        - gets the best model
         """
         best_models = {}
 

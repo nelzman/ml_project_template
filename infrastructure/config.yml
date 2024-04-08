@@ -5,7 +5,7 @@ azure_ml:
   workspace_name: azure_ml_demos
   compute_target: cpu-cluster-light
 training:
-  target: Petal.Width  # Species
+  target: price
   algorithms: [LinearRegression, XGBRegressor]
   ensemble_weights: null
   evaluate_metric: mean_absolute_percentage_error        

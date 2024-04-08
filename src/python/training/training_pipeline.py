@@ -1,18 +1,13 @@
 import datetime as dt
 import logging
-import os
 from typing import Callable, Union
 import joblib
 
 import pandas as pd
 from sklearn.ensemble import VotingRegressor
 
-# explicitly require this experimental feature
-from sklearn.experimental import enable_iterative_imputer  # noqa
-
 # now you can import normally from sklearn.impute
-from sklearn.impute import IterativeImputer, SimpleImputer
-from sklearn.impute._base import _BaseImputer
+from sklearn.impute import SimpleImputer
 from sklearn.metrics import explained_variance_score, make_scorer, r2_score
 from sklearn.model_selection import GridSearchCV, KFold, cross_validate
 from sklearn.pipeline import Pipeline
@@ -114,7 +109,7 @@ class TrainingPipeline:
 
         # save complete model files:
         if save_trees:                
-            with open(f"src/python/models/model_tree.pkl", "wb") as f:
+            with open(f"src/artifacts/models/housing_model_tree.pkl", "wb") as f:
                 joblib.dump(self.model_tree, f)
 
         training_end = dt.datetime.now()
@@ -209,19 +204,9 @@ class TrainingPipeline:
             self._logger.info(f"\t\tBest performance on cv-testset: {grid.best_score_}")
             self._logger.info(f"\t\tBest performance on testset: {grid.best_test_score_}")
 
-            # fill model- and coef-dictionary:
-            feature_coefficients = self._fi.get_feature_importance_rank(
-                columns=x_train.columns,
-                grid=grid,
-                x_train=x_train,
-                y_train=y_train,
-                estimator=grid.best_estimator_.named_steps.model,
-            )
-
             self._save_model_test_file(grid)
 
             self.model_tree[algorithm] = grid
-            self.model_tree[algorithm].feature_coefficients = feature_coefficients
             # add best estimator to ensemble model:
             ensemble_estimators.append((algorithm, self.model_tree[algorithm].best_estimator_))
 
@@ -244,19 +229,9 @@ class TrainingPipeline:
         self._logger.info(f"\t\tBest performance on cv-testset: {model.best_score_}")
         self._logger.info(f"\t\tBest performance on testset: {model.best_test_score_}")
 
-        # fill model- and coef-dictionary:
-        feature_coefficients = self._fi.get_feature_importance_rank_ensemble(
-            columns=x_train.columns,
-            grid=grid,
-            x_train=x_train,
-            y_train=y_train,
-            estimator=model,
-        )
-
         self._save_model_test_file(model, is_ensemble=True)
 
         self.model_tree[algorithm] = model
-        self.model_tree[algorithm].feature_coefficients = feature_coefficients
 
         return self.model_tree
 

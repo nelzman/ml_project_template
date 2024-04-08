@@ -1,6 +1,6 @@
+import os
 import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
-
 
 
 class TrainingVisualizer:
@@ -16,7 +16,6 @@ class TrainingVisualizer:
         :return: boolean indicating that plotting was successful
 
         - makes plots to compare model results
-        - 7 plots per segment
         """
 
         # color dictionary for plots and legend:
@@ -35,7 +34,7 @@ class TrainingVisualizer:
             gridspec_kw={"width_ratios": (0.25, 0.25, 0.25, 0.25)},
         )
         fig.suptitle(
-            f'{self._config["general"]["customer_name"]}: Training-plots',
+            "Training-plots",
             fontsize=16,
         )
 
@@ -59,10 +58,10 @@ class TrainingVisualizer:
         self._plot_cooks_distance(axs[2, 0])
 
         # make feature importance plot:
-        self._plot_feature_importance(axs[2, 1], model_color_dict)
+        #self._plot_feature_importance(axs[2, 1], model_color_dict)
 
         # correlation plot between features and rbl
-        self._plot_correlation(axs[2, 2])
+        #self._plot_correlation(axs[2, 2])
 
         # legend:
         patches = [mpatches.Patch(color=model_color_dict[model], label=model) for model in model_color_dict.keys()]
@@ -77,6 +76,7 @@ class TrainingVisualizer:
         # plot or save the plots:
         if save_plots:
             file_name = f"training_plots_{timestamp}"
+            os.makedirs("artifacts/plots/training", exist_ok=True)
             plt.savefig(f"artifacts/plots/training/{file_name}", bbox_inches=None, dpi=None)
             plt.close()
         else:
@@ -93,21 +93,21 @@ class TrainingVisualizer:
         - plots training-data-rbl and the predictions made by the models
         """
         ax.scatter(
-            self._training_results_dict["x"][self._config["training"]["time_column"]],
-            self._training_results_dict["y"],
+            self._training_results_dict["data"]["x_train"].index,
+            self._training_results_dict["data"]["y_train"],
             s=8,
             alpha=1,
             color="black",
         )
         for model_name in self._training_results_dict["algorithm_names"]:
             ax.scatter(
-                self._training_results_dict["x"][self._config["training"]["time_column"]],
+                self._training_results_dict["data"]["x_train"].index,
                 self._training_results_dict[model_name]["y_pred"],
                 s=self._config["training"]["plotting_params"]["s"],
                 alpha=self._config["training"]["plotting_params"]["alpha"],
                 color=model_color_dict[model_name],
             )
-        ax.set(ylabel="Prediction Values Training Set", xlabel="Heat Number")
+        ax.set(ylabel="Prediction Values Training Set", xlabel="Index")
 
     def _plot_test_predictions(self, ax: object, model_color_dict: dict) -> None:
         """
@@ -118,21 +118,21 @@ class TrainingVisualizer:
         - plots training-data-rbl and the predictions made by the models
         """
         ax.scatter(
-            self._training_results_dict["x_test"][self._config["training"]["time_column"]],
-            self._training_results_dict["y_test"],
+            self._training_results_dict["data"]["x_test"].index,
+            self._training_results_dict["data"]["y_test"],
             s=8,
             alpha=1,
             color="black",
         )
         for model_name in self._training_results_dict["algorithm_names"]:
             ax.scatter(
-                self._training_results_dict["x_test"][self._config["training"]["time_column"]],
+                self._training_results_dict["data"]["x_test"].index,
                 self._training_results_dict[model_name]["y_test_pred"],
                 s=self._config["training"]["plotting_params"]["s"],
                 alpha=self._config["training"]["plotting_params"]["alpha"],
                 color=model_color_dict[model_name],
             )
-        ax.set(ylabel="Prediction Values Test Set", xlabel="Heat Number")
+        ax.set(ylabel="Prediction Values Test Set", xlabel="Index")
 
     def _plot_goodness_of_fit(self, ax: object, model_color_dict: dict) -> None:
         """
@@ -144,7 +144,7 @@ class TrainingVisualizer:
         """
         for model_name in self._training_results_dict["algorithm_names"]:
             ax.scatter(
-                self._training_results_dict["y"],
+                self._training_results_dict["data"]["y_train"],
                 self._training_results_dict[model_name]["y_pred"],
                 s=self._config["training"]["plotting_params"]["s"],
                 alpha=self._config["training"]["plotting_params"]["alpha"],
@@ -163,7 +163,7 @@ class TrainingVisualizer:
         """
         for model_name in self._training_results_dict["algorithm_names"]:
             ax.scatter(
-                self._training_results_dict["y_test"],
+                self._training_results_dict["data"]["y_test"],
                 self._training_results_dict[model_name]["y_test_pred"],
                 s=self._config["training"]["plotting_params"]["s"],
                 alpha=self._config["training"]["plotting_params"]["alpha"],
@@ -182,14 +182,14 @@ class TrainingVisualizer:
         """
         for model_name in self._training_results_dict["algorithm_names"]:
             ax.scatter(
-                self._training_results_dict["x"][self._config["training"]["time_column"]],
-                self._training_results_dict[model_name]["y_residuals"],
+                self._training_results_dict["data"]["x_train"].index,
+                self._training_results_dict[model_name]["y_train_residuals"],
                 s=self._config["training"]["plotting_params"]["s"],
                 alpha=self._config["training"]["plotting_params"]["alpha"],
                 color=model_color_dict[model_name],
             )
         ax.axhline(0, color="lightgray", linestyle="--")
-        ax.set(ylabel="Residuals Training Set", xlabel="Heat Number")
+        ax.set(ylabel="Residuals Training Set", xlabel="Index")
 
     def _plot_test_residuals(self, ax: object, model_color_dict: dict) -> None:
         """
@@ -201,14 +201,14 @@ class TrainingVisualizer:
         """
         for model_name in self._training_results_dict["algorithm_names"]:
             ax.scatter(
-                self._training_results_dict["x_test"][self._config["training"]["time_column"]],
+                self._training_results_dict["data"]["x_test"].index,
                 self._training_results_dict[model_name]["y_test_residuals"],
                 s=self._config["training"]["plotting_params"]["s"],
                 alpha=self._config["training"]["plotting_params"]["alpha"],
                 color=model_color_dict[model_name],
             )
         ax.axhline(0, color="lightgray", linestyle="--")
-        ax.set(ylabel="Residuals Test Set", xlabel="Heat Number")
+        ax.set(ylabel="Residuals Test Set", xlabel="Index")
 
     def _plot_boxplots(self, ax: object, names: list) -> None:
         """
@@ -246,7 +246,7 @@ class TrainingVisualizer:
         )
         ax.tick_params("x", labelsize=12, labelrotation=20)
 
-    def _plot_cooks_distance(self, ax: object, segment: str) -> None:
+    def _plot_cooks_distance(self, ax: object) -> None:
         """
         :param ax: axes for plot
         :return: None, adds plot to figure
@@ -254,7 +254,7 @@ class TrainingVisualizer:
         - plots the cooks-distance, an indicator of how influencial each sample is
         """
         (markers, stem_lines, _) = ax.stem(
-            self._training_results_dict["cooks_distance_data"][self._config["training"]["time_column"]],
+            self._training_results_dict["cooks_distance_data"].index,
             self._training_results_dict["cooks_distance"][0],
             markerfmt=" ",
             basefmt=" ",
@@ -264,7 +264,7 @@ class TrainingVisualizer:
 
         ax.axhline(0, color="lightgray", linestyle="--")
 
-        ax.set(xlabel="heat number", ylabel="Cooks Distance")
+        ax.set(xlabel="Index", ylabel="Cooks Distance")
 
     def _plot_feature_importance(self, ax: object, model_color_dict: dict) -> None:
         """
@@ -282,9 +282,9 @@ class TrainingVisualizer:
             )
 
         ax.set(ylabel="Column Name", xlabel="Rank (Ensemble as Reference)")
-        ax.tick_params("y", labelsize=8)
+        ax.tick_params("y_train", labelsize=8)
 
-    def _plot_correlation(self, ax: object, segment: str) -> None:
+    def _plot_correlation(self, ax: object) -> None:
         """
         :param ax: axes for plot
         :return: None, adds plot to figure
@@ -292,7 +292,7 @@ class TrainingVisualizer:
         - plots the correlation of the features to the rbl
         - orders them by the feature-order of the plot_feature_importance-method
         """
-        if self._training_results_dict["rbl_corr"].isnull().all():
+        if self._training_results_dict["rbl_corr"].isnull().all().all():
             ax.text(0, 0.5, "No correlation available")
         else:
             ax.scatter(
@@ -304,7 +304,7 @@ class TrainingVisualizer:
         ax.axvline(0, color="lightgray")
 
         ax.set(ylabel="Column Name", xlabel="Correlation to Target", xlim=(-1, 1))
-        ax.tick_params("y", labelsize=8)
+        ax.tick_params("y_train", labelsize=8)
 
     def _plot_diagonal_line(self, ax: object) -> None:
         """
