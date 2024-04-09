@@ -14,7 +14,7 @@ from sklearn.model_selection import GridSearchCV, KFold, cross_validate
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from src.python.training.kpi_generator import KPIGenerator
+from src.python.training.metric_generator import MetricGenerator
 from src.python.training.training_evaluator import TrainingEvaluator
 from src.python.training.training_preparation import TrainingPreparation
 from src.python.training.training_utils import TrainingUtils
@@ -38,7 +38,7 @@ class TrainingPipeline:
         self._evaluate_metric = self._config["training"]["evaluate_metric"]
         self.model_tree = {}
         self._training_results_dict = {}
-        self._kpi_generator = KPIGenerator(y_true=None, y_pred=None)
+        self._metric_generator = MetricGenerator(y_true=None, y_pred=None)
 
     def train(
         self,
@@ -150,7 +150,7 @@ class TrainingPipeline:
         multi_metric = {
             "nrmse": "neg_root_mean_squared_error",
             "mean_absolute_percentage_error": make_scorer(
-                self._kpi_generator.calculate_mean_absolute_percentage_error,
+                self._metric_generator.calculate_mean_absolute_percentage_error,
                 greater_is_better=False,
             ),
             "r2": make_scorer(r2_score),
@@ -161,17 +161,6 @@ class TrainingPipeline:
         for algorithm in algorithms:
             # train model:
             _estimator, _param_grid = self._get_estimator_and_parameters(algorithm)
-            # "extrapolate" should be set to true only when target value is RBL
-            if self._config["training"].get("extrapolate"):
-                data = self._data.copy()
-                (
-                    x_train,
-                    y_train,
-                    x_test,
-                    y_test,
-                    _pre_selected_columns,
-                ) = self._train_preparation.construct_training_data(data)
-                self._logger.info("Extrapolation on measurement data to reach threshold is executed")
             
             pipeline = Pipeline(
                 steps=[
@@ -194,10 +183,10 @@ class TrainingPipeline:
             grid = grid.fit(x_train, y_train)
 
             y_pred = grid.predict(x_test)
-            kpi_generator = KPIGenerator(y_true=y_test, y_pred=y_pred)
-            model_kpis = kpi_generator.calculate_all_kpis()
-            grid.best_test_score_ = -1 * model_kpis[self._evaluate_metric]
-            grid.scores_ = model_kpis
+            metric_generator = MetricGenerator(y_true=y_test, y_pred=y_pred)
+            model_metrics = metric_generator.calculate_all_metrics()
+            grid.best_test_score_ = -1 * model_metrics[self._evaluate_metric]
+            grid.scores_ = model_metrics
             grid.used_features = used_features
 
             # print and log training results:
@@ -221,10 +210,10 @@ class TrainingPipeline:
         model.used_features = used_features
 
         y_pred = model.predict(x_test)
-        kpi_generator = KPIGenerator(y_true=y_test, y_pred=y_pred)
-        model_kpis = kpi_generator.calculate_all_kpis()
-        model.best_test_score_ = -1 * model_kpis[self._evaluate_metric]
-        model.scores_ = model_kpis
+        metric_generator = MetricGenerator(y_true=y_test, y_pred=y_pred)
+        model_metrics = metric_generator.calculate_all_metrics()
+        model.best_test_score_ = -1 * model_metrics[self._evaluate_metric]
+        model.scores_ = model_metrics
 
         # print and log training results:
         self._logger.info(f"\tAlgorithm: {algorithm}")

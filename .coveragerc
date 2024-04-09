@@ -1,0 +1,12 @@
+[run]
+omit =
+    # omit test-files of different repos:
+    src/test/*
+
+    # omit specific .py files:
+    */__init__.py
+
+[report]
+exclude_lines =
+    pragma: no cover # add this as a comment to lines that should be excluded
+    if __name__ == .__main__.:

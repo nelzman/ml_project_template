@@ -5,13 +5,13 @@ import pandas as pd
 from sklearn.metrics import explained_variance_score, mean_absolute_percentage_error, mean_squared_error, r2_score
 
 
-class KPIGenerator:
+class MetricGenerator:
     """
     :param y_true: the ground-truth to compare the prediction to
-    :param y_pred: prediction to calculate the KPIs for
+    :param y_pred: prediction to calculate the metrics for
     :return: none
 
-    - class that generates different KPIs for model evaluation
+    - class that generates different metrics for model evaluation
     """
 
     def __init__(
@@ -23,12 +23,12 @@ class KPIGenerator:
     ) -> None:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param count_param_coeffs: parameters coefficients used for scoring
         :param train_obs: observations used for training
         :return: none
 
-        - initializes all the necessary attributes for the KPIGenerator object.
+        - initializes all the necessary attributes for the MetricGenerator object.
         """
 
         if y_true is not None and y_pred is not None and len(y_true) != len(y_pred):
@@ -49,8 +49,8 @@ class KPIGenerator:
         self.r2_score = None
         self.adjusted_r2_score = None
 
-        self.kpi_dict = {}
-        self.delta_kpi_dict = {}
+        self.metric_dict = {}
+        self.delta_metric_dict = {}
 
     def _get_start_time_point(self, time_horizon: int = None) -> int:
         """
@@ -77,7 +77,7 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :return: r2-score for the time-horizon
 
@@ -103,7 +103,7 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :return: adjusted r2-score for the time-horizon
 
@@ -131,7 +131,7 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :return: mean_squared_error for the time-horizon
 
@@ -158,7 +158,7 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :return: root_mean_squared_error for the time-horizon
 
@@ -185,7 +185,7 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :param  normalize_method: normalization method. Can be one of ['mean', 'range', 'std', 'iqr'].
                 None refers to root_mean_squared_error
@@ -229,7 +229,7 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :return: explained_variance_score for the time-horizon
 
@@ -255,7 +255,7 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :return: the standard deviation of the deltas for a time-horizon
 
@@ -282,7 +282,7 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :return: relative standard deviation of the deltas for the time-horizon
 
@@ -310,7 +310,7 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :return: mean_absolute_percentage_error for the time-horizon
 
@@ -338,12 +338,12 @@ class KPIGenerator:
     ) -> float:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
         :param  region: percentage to under/overpredict
         :param  calc_type: type of region-definition. 'start' draws the region based on the starting brick length.
                 'truth' calculates the region based on every y_true value.
-        :return: region-KPI for the time-horizon
+        :return: region-metric for the time-horizon
 
         - calculates the percentage of predictions within the range of their true- or start-value.
         """
@@ -359,21 +359,21 @@ class KPIGenerator:
 
         if calc_type == "start":
             region_width = y_true_th[0] * region
-            kpi = [
+            metric = [
                 1 if (y_pred_th[i] >= y_true_th[i] - region_width) and (y_pred_th[i] <= y_true_th[i] + region_width) else 0
                 for i in range(len(y_true_th))
             ]
         elif calc_type == "truth":
-            kpi = [
+            metric = [
                 y_pred_th[i] / y_true_th[i] - 1 if y_true_th[i] != 0 else y_pred_th[i] / (y_true_th[i] + 0.01) - 1
                 for i in range(len(y_true_th))
             ]
-            kpi = [1 if (value >= -region) and (value <= region) else 0 for value in kpi]
-        self.regional_accuracy = np.sum(kpi) / len(self.y_true)
+            metric = [1 if (value >= -region) and (value <= region) else 0 for value in metric]
+        self.regional_accuracy = np.sum(metric) / len(self.y_true)
 
         return self.regional_accuracy
 
-    def calculate_all_kpis(
+    def calculate_all_metrics(
         self,
         y_true: Union[np.array, list] = None,
         y_pred: Union[np.array, list] = None,
@@ -381,39 +381,39 @@ class KPIGenerator:
     ) -> dict:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
+        :param y_pred: prediction to calculate the metrics for
         :param time_horizon: time horizon for the score in days
-        :return: dict with KPIs
+        :return: dict with metrics
 
-        - calculates all KPIs for a time-horizon
+        - calculates all metrics for a time-horizon
         """
 
         self.y_true = y_true if y_true is not None else self.y_true
         self.y_pred = y_pred if y_pred is not None else self.y_pred
 
-        self.kpi_dict["mean_absolute_percentage_error"] = self.calculate_mean_absolute_percentage_error(time_horizon=time_horizon)
-        self.kpi_dict["delta_standard_deviation"] = self.calculate_delta_standard_deviation(time_horizon=time_horizon)
-        self.kpi_dict["delta_relative_standard_deviation"] = self.calculate_delta_relative_standard_deviation(
+        self.metric_dict["mean_absolute_percentage_error"] = self.calculate_mean_absolute_percentage_error(time_horizon=time_horizon)
+        self.metric_dict["delta_standard_deviation"] = self.calculate_delta_standard_deviation(time_horizon=time_horizon)
+        self.metric_dict["delta_relative_standard_deviation"] = self.calculate_delta_relative_standard_deviation(
             time_horizon=time_horizon
         )
-        self.kpi_dict["explained_variance_score"] = self.calculate_explained_variance_score(time_horizon=time_horizon)
-        self.kpi_dict["mean_squared_error"] = self.calculate_mean_squared_error(time_horizon=time_horizon)
-        self.kpi_dict["root_mean_squared_error"] = self.calculate_root_mean_squared_error(time_horizon=time_horizon)
-        self.kpi_dict["regional_accuracy_start"] = self.calculate_regional_accuracy(time_horizon=time_horizon, calc_type="start")
-        self.kpi_dict["regional_accuracy_truth"] = self.calculate_regional_accuracy(time_horizon=time_horizon, calc_type="truth")
-        self.kpi_dict["r2_score"] = self.calculate_r2_score(time_horizon=time_horizon)
+        self.metric_dict["explained_variance_score"] = self.calculate_explained_variance_score(time_horizon=time_horizon)
+        self.metric_dict["mean_squared_error"] = self.calculate_mean_squared_error(time_horizon=time_horizon)
+        self.metric_dict["root_mean_squared_error"] = self.calculate_root_mean_squared_error(time_horizon=time_horizon)
+        self.metric_dict["regional_accuracy_start"] = self.calculate_regional_accuracy(time_horizon=time_horizon, calc_type="start")
+        self.metric_dict["regional_accuracy_truth"] = self.calculate_regional_accuracy(time_horizon=time_horizon, calc_type="truth")
+        self.metric_dict["r2_score"] = self.calculate_r2_score(time_horizon=time_horizon)
         if self.count_param_coeffs is not None:
-            self.kpi_dict["adjusted_r2_score"] = self.calculate_adjusted_r2_score(time_horizon=time_horizon)
+            self.metric_dict["adjusted_r2_score"] = self.calculate_adjusted_r2_score(time_horizon=time_horizon)
 
-        return self.kpi_dict
+        return self.metric_dict
 
-    def calculate_delta_kpis(self, y_true: Union[np.array, list] = None, y_pred: Union[np.array, list] = None) -> dict:
+    def calculate_delta_metrics(self, y_true: Union[np.array, list] = None, y_pred: Union[np.array, list] = None) -> dict:
         """
         :param y_true: the ground-truth to compare the prediction to
-        :param y_pred: prediction to calculate the KPIs for
-        :return: dict with delta kpis
+        :param y_pred: prediction to calculate the metrics for
+        :return: dict with delta metrics
 
-        - calculate kpis for the deltas
+        - calculate metrics for the deltas
         """
 
         self.y_true = y_true if y_true is not None else self.y_true
@@ -426,7 +426,7 @@ class KPIGenerator:
 
         if len(delta_rbls) > 0:
             quantiles = np.quantile(delta_rbls, q=[0.1, 0.25, 0.5, 0.75, 0.9])
-            self.delta_kpi_dict = {
+            self.delta_metric_dict = {
                 "number_of_measurements": len(delta_rbls),
                 "mean": np.mean(delta_rbls),
                 "min": np.min(delta_rbls),
@@ -437,11 +437,11 @@ class KPIGenerator:
                 "p_75": quantiles[3],
                 "p_90": quantiles[4],
                 "last_heat_delta": delta_rbls[-1],
-                "over_under_prediction_kpi": np.mean(over_under_prediction),
+                "over_under_prediction_metric": np.mean(over_under_prediction),
                 "std": np.std(delta_rbls),
                 "var": np.var(delta_rbls),
             }
 
-            return self.delta_kpi_dict
+            return self.delta_metric_dict
         else:
             return {}
