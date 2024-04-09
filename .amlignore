@@ -1,0 +1,39 @@
+# files not to include into an experiment-snapshot:
+
+# general files:
+*/*__pycache__/
+**/__pycache__/*
+*/*.pyc
+*.coverage*
+
+# invisible folders:
+.git
+.idea
+.run
+.vscode
+.pytest_cache
+
+# visible folders:
+api
+azure_downloaded
+
+# specific files to keep:
+/*/  #ignore all
+
+# except:
+## env files:
+!infrastructure/
+infrastructure/*/
+!infrastructure/environment.yml
+
+## data files:
+!/artifacts/
+/artifacts/*/
+!/artifacts/data/
+
+## code files:
+!src/
+src/*/
+!/src/python/
+!/src/r/
+

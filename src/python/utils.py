@@ -1,6 +1,7 @@
 import yaml
 import os
 import time
+import json
 import joblib
 import logging
 import datetime as dt
@@ -82,3 +83,17 @@ def setup_logging(filename: str, log_level: int = logging.INFO
         if os.path.getmtime(os.path.join(logs_path_all, file)) < time_calculated_to_del_log:
             os.remove(os.path.join(logs_path_all, file))
     return logger
+
+def load_json(full_path: str, filename: str, mode: str = "r", file_encoding: str = "utf-8") -> dict:
+    """
+    :param full_path: The full path to the json file to load
+    :param filename: name of the file to load data from
+    :param mode: The mode in which the file is to be opened (r, w, a...)
+    :param file_encoding: The encoding used when the file will be opened
+    :return: A python dictionary of data representing the file`s contents
+    :rtype: dict
+
+    - loads a json file from a given specified path.
+    """
+    with open(f"{full_path}/{filename}", mode, encoding=file_encoding) as json_file:
+        return json.load(json_file)

@@ -1,0 +1,13 @@
+# mcr.microsoft.com/azureml/<image_name>:<tag>
+FROM mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04:20220616.v1
+
+# Switch to root to install apt packages
+USER root:root
+
+# install packages
+RUN apt-get update && \
+    apt-get install -y libpangocairo-1.0-0 && \
+    apt install -y libgl1-mesa-glx
+
+# Switch back to non-root user
+USER dockeruser

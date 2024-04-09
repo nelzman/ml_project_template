@@ -14,7 +14,7 @@ from azureml.data.datapath import DataPath
 from azureml.exceptions import UserErrorException
 from mlflow.entities import Experiment
 
-from src.python.azure_ml.aml_utils import AMLUtils
+from src.python.azure_ml.azure_ml_utils import AMLUtils
 
 
 class MLFlowLogger:
@@ -29,12 +29,14 @@ class MLFlowLogger:
         self._logger = logger
         self._experiment_name = experiment_name
         self._use_azure_ml = use_azure_ml
+
         self.workspace = self._setup_mlflow_logging()
 
-    def log_training_runner(self, model_tree: dict, is_pipeline_run: bool = False, update_model_registry: bool = False) -> None:
+    def log_training_runner(self, model_tree: dict,
+                            save_trees: bool = False, update_model_registry: bool = False) -> None:
         """
         :param model_tree: dictionary with the models
-        :param is_pipeline_run: dictionary with the models
+        :param save_trees: whether to save the trees
         :param update_model_registry: whether to update the model registry
         :return: None
 
@@ -72,16 +74,17 @@ class MLFlowLogger:
         overall_score = np.mean(best_scores)
         mlflow.log_metric("overall_score", overall_score)
 
-        if self._use_azure_ml:
+        if self._use_azure_ml and save_trees:
+        
             run = mlflow.active_run()
             model_name = (
                 f"housing_model_tree"
             )
             model_artifact_path = (
-                f"./src/artifacts/models/"
-                f"housing_model_tree.pkl"
+                f"./artifacts/models/"
+                f"{model_name}.pkl"
             )
-            artifact_path = f"models/{model_name}"
+            aml_artifact_path = f"models/{model_name}"
             model_properties = {"run_id": run.info.run_id, "experiment": self._experiment_name}
             try:
                 experiment_url = str(Run.get(self.workspace, run_id=model_properties["run_id"]).get_portal_url())
@@ -95,7 +98,9 @@ class MLFlowLogger:
             }
 
             # Todo: add description to readme for stages and switch to stages with mflow 2.*
-            mlflow.log_artifact(local_path=model_artifact_path, artifact_path=artifact_path)
+            mlflow.log_artifact(local_path=model_artifact_path, artifact_path=aml_artifact_path)
+            
+        if update_model_registry:
             self._logger.info("Registering model with aml-sdk")
             model = Model.register(
                 workspace=self.workspace,

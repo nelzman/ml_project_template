@@ -1,3 +1,4 @@
+import os
 import datetime as dt
 import logging
 from typing import Callable, Union
@@ -104,12 +105,13 @@ class TrainingPipeline:
 
         # save training results for testing of the TrainingVisualizer:
         if self._save_files_for_tests:
-            with open(f"src/shared/test/unit/test_python/test_training/test_files/test_training_results_dict.pkl", "wb") as f:
+            with open(f"{self._TEST_PATH}/test_training_results_dict.pkl", "wb") as f:
                 joblib.dump(self._training_results_dict, f)
 
         # save complete model files:
-        if save_trees:                
-            with open(f"src/artifacts/models/housing_model_tree.pkl", "wb") as f:
+        if save_trees:     
+            os.makedirs("./artifacts/models/", exist_ok=True)           
+            with open("./artifacts/models/housing_model_tree.pkl", "wb") as f:
                 joblib.dump(self.model_tree, f)
 
         training_end = dt.datetime.now()

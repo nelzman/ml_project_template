@@ -4,34 +4,34 @@ from azureml.core import Experiment, ScriptRunConfig, Workspace
 from azureml.core.authentication import InteractiveLoginAuthentication
 from azureml.core.runconfig import RunConfiguration
 
-from src.python.azure_ml.aml_utils import AMLUtils
+from src.python.azure_ml.azure_ml_utils import AMLUtils
 
 
 class AMLExperiment:
     """
-    Class to setup aml-experiments and logging via mlflow
+    Class to setup azure-ml-experiments and logging via mlflow
     """
 
     def __init__(self, config: dict) -> None:
         self._config = config
 
         try:
-            credentials = InteractiveLoginAuthentication(tenant_id=self._config["aml"]["tenant_id"])
+            credentials = InteractiveLoginAuthentication(tenant_id=self._config["azure_ml"]["tenant_id"])
         except Exception as ex:
             print(ex)
             credentials = None
         self._workspace = Workspace.get(
-            name=self._config["aml"]["dev"]["workspace_name"],
-            subscription_id=self._config["aml"]["subscription_id"],
-            resource_group=self._config["aml"]["dev"]["resource_group"],
+            name=self._config["azure_ml"]["workspace_name"],
+            subscription_id=self._config["azure_ml"]["subscription_id"],
+            resource_group=self._config["azure_ml"]["resource_group"],
             auth=credentials,
         )
         self._aml_utils = AMLUtils(self._config, self._workspace)
 
     def run(
         self,
-        file: str, 
-        args: dict,
+        ide: str,
+        runner: str, 
         env_version: str,
         use_compute_target: str,
     ) -> None:
@@ -48,6 +48,9 @@ class AMLExperiment:
         - this runner takes another runner and sends it to aml as an experiment
         - things are logged with mlflow inside the runners
         """
+        
+        runner_dict, runner_name = self._aml_utils.get_runner_details(ide, runner)
+
         # setup aml:
 
         env = self._aml_utils.get_environment(env_version)
@@ -57,17 +60,17 @@ class AMLExperiment:
         run_config = RunConfiguration()
         run_config.environment = env
         run_config.target = aml_compute
-        run_config.environment_variables = {"AML": "Distinction between execution environments"}
+        run_config.environment_variables = {"AzureML": "Distinction between execution environments"}
 
-        exp = Experiment(workspace=self._workspace, name=f"{file}_experiment")
+        exp = Experiment(workspace=self._workspace, name=f"{runner_name.replace(' ', '_')}_experiment")
 
         # sending runners to aml:
         try:
             run_config = ScriptRunConfig(
                 source_directory="",
-                script=f"src/{file}",
+                script=f"src/python/runners/{runner_dict[runner_name]['file']}",
                 docker_runtime_config=docker_config,
-                arguments=args,
+                arguments=runner_dict[runner_name]["param_list"],
                 run_config=run_config,
             )
             execution = exp.submit(run_config)

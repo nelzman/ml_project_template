@@ -5,7 +5,7 @@ import pandas as pd
 
 import mlflow
 from src.python.azure_ml.mlflow_logger import MLFlowLogger
-from src.python.azure_ml.aml_utils import AMLUtils
+from src.python.azure_ml.azure_ml_utils import AMLUtils
 from src.python.preprocess.preprocessor import Preprocessor
 from src.python.training.training_pipeline import TrainingPipeline
 import src.python.utils as utils
@@ -93,4 +93,4 @@ if __name__ == "__main__":
             config["training"]["algorithms"], ensemble_weights=config["training"]["ensemble_weights"], save_trees=save_models
         )
 
-        mlflow_logger.log_training_runner(model_tree=model_tree)
+        mlflow_logger.log_training_runner(model_tree=model_tree, save_trees=save_models, update_model_registry=False)
