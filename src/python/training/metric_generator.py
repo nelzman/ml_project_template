@@ -391,7 +391,9 @@ class MetricGenerator:
         self.y_true = y_true if y_true is not None else self.y_true
         self.y_pred = y_pred if y_pred is not None else self.y_pred
 
-        self.metric_dict["mean_absolute_percentage_error"] = self.calculate_mean_absolute_percentage_error(time_horizon=time_horizon)
+        self.metric_dict["mean_absolute_percentage_error"] = self.calculate_mean_absolute_percentage_error(
+            time_horizon=time_horizon
+        )
         self.metric_dict["delta_standard_deviation"] = self.calculate_delta_standard_deviation(time_horizon=time_horizon)
         self.metric_dict["delta_relative_standard_deviation"] = self.calculate_delta_relative_standard_deviation(
             time_horizon=time_horizon
@@ -399,8 +401,12 @@ class MetricGenerator:
         self.metric_dict["explained_variance_score"] = self.calculate_explained_variance_score(time_horizon=time_horizon)
         self.metric_dict["mean_squared_error"] = self.calculate_mean_squared_error(time_horizon=time_horizon)
         self.metric_dict["root_mean_squared_error"] = self.calculate_root_mean_squared_error(time_horizon=time_horizon)
-        self.metric_dict["regional_accuracy_start"] = self.calculate_regional_accuracy(time_horizon=time_horizon, calc_type="start")
-        self.metric_dict["regional_accuracy_truth"] = self.calculate_regional_accuracy(time_horizon=time_horizon, calc_type="truth")
+        self.metric_dict["regional_accuracy_start"] = self.calculate_regional_accuracy(
+            time_horizon=time_horizon, calc_type="start"
+        )
+        self.metric_dict["regional_accuracy_truth"] = self.calculate_regional_accuracy(
+            time_horizon=time_horizon, calc_type="truth"
+        )
         self.metric_dict["r2_score"] = self.calculate_r2_score(time_horizon=time_horizon)
         if self.count_param_coeffs is not None:
             self.metric_dict["adjusted_r2_score"] = self.calculate_adjusted_r2_score(time_horizon=time_horizon)

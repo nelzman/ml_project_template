@@ -10,7 +10,9 @@ class TrainingPreparation:
         self._config = config
         self._logger = logger
 
-    def construct_training_data(self, data: pd.DataFrame, columns: list = []) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, list]:
+    def construct_training_data(
+        self, data: pd.DataFrame, columns: list = []
+    ) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, list]:
         """
         :param datasets: datasets to construct train-test data
         :return: a tuple with (training_x, training_y, test_x, test_y, preselected columns, cross-validation-settings)
@@ -94,4 +96,3 @@ class TrainingPreparation:
         if initial_col_number > len(x_train.columns):
             self._logger.warning("Columns were dropped before Training due to being full of nans")
         return x_train, y_train, x_test, y_test
-

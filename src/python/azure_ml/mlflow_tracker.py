@@ -17,7 +17,7 @@ from mlflow.entities import Experiment
 from src.python.azure_ml.azure_ml_utils import AMLUtils
 
 
-class MLFlowLogger:
+class MLFlowTracker:
     """
     Class to log run-specific metrics, tags, outputs and artifacts with mlflow usable locally and in aml
     """
@@ -33,7 +33,9 @@ class MLFlowLogger:
         self.workspace = self._setup_mlflow_logging()
 
     def log_training_runner(self, model_tree: dict,
-                            save_trees: bool = False, update_model_registry: bool = False) -> None:
+                            save_trees: bool = False, 
+                            update_model_registry: bool = False, 
+                            model_name: str = "housing_model_tree") -> None:
         """
         :param model_tree: dictionary with the models
         :param save_trees: whether to save the trees
@@ -77,9 +79,6 @@ class MLFlowLogger:
         if self._use_azure_ml and save_trees:
         
             run = mlflow.active_run()
-            model_name = (
-                f"housing_model_tree"
-            )
             model_artifact_path = (
                 f"./artifacts/models/"
                 f"{model_name}.pkl"
@@ -96,8 +95,6 @@ class MLFlowLogger:
                 "overall_score": overall_score,
                 "experiment_url": experiment_url,
             }
-
-            # Todo: add description to readme for stages and switch to stages with mflow 2.*
             mlflow.log_artifact(local_path=model_artifact_path, artifact_path=aml_artifact_path)
             
         if update_model_registry:

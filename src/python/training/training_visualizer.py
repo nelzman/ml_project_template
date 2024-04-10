@@ -58,10 +58,10 @@ class TrainingVisualizer:
         self._plot_cooks_distance(axs[2, 0])
 
         # make feature importance plot:
-        #self._plot_feature_importance(axs[2, 1], model_color_dict)
+        # self._plot_feature_importance(axs[2, 1], model_color_dict)
 
         # correlation plot between features and rbl
-        #self._plot_correlation(axs[2, 2])
+        # self._plot_correlation(axs[2, 2])
 
         # legend:
         patches = [mpatches.Patch(color=model_color_dict[model], label=model) for model in model_color_dict.keys()]

@@ -24,7 +24,7 @@ class TrainingEvaluator:
         :return: dictionary with training results
 
         - calculates results for the models
-        """        
+        """
 
         # fill training_results:
         self._training_results_dict = {"data": {"x_train": x_train, "y_train": y_train, "x_test": x_test, "y_test": y_test}}
@@ -119,4 +119,3 @@ class TrainingEvaluator:
             ValueError(f"Choosen scoring model with name {config['scoring']['use_algorithm']} not found!")
 
         return best_models
-

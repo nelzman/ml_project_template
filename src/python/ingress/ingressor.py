@@ -1,29 +1,15 @@
-# Data Ingressor
+import pandas as pd
+import logging
 
-## load libraries:
-```{R}
-source("src/r/utils.R")
+class DataIngressor:
+    def __init__(self, config: dict, logger: logging.Logger) -> None:
+        self._config = config
+        self._logger = logger
 
-install_or_load(c("ggplot2", "dplyr", "tidyr"))
-```
-
-
-## Create a class to load data and split it into train and test sets:
-```{R}
-setClass("Ingressor", slots = c(
-  file_path = "character",
-  #data = "data.frame",
-  )
-)
-
-setMethod(
-    "run",
-    signature("Ingressor"),
-    function(object){
-        object@data = read.csv(object@file_path)
-        return(object)
-    }
-)
-
-ingressor <- new("Ingressor", file_path = "artifacts/data/iris.csv")
-```
+    def ingress(self, location: str = "local"):
+        
+        if location == "local":
+            data = pd.read_csv("artifacts/data/Housing.csv")
+        else:
+            raise NotImplementedError("Only location == 'local' is supported until now!")
+        return data

@@ -4,10 +4,11 @@ import os
 import pandas as pd
 
 import mlflow
-from src.python.azure_ml.mlflow_logger import MLFlowLogger
+from src.python.azure_ml.mlflow_tracker import MLFlowTracker
 from src.python.azure_ml.azure_ml_utils import AMLUtils
 from src.python.preprocess.preprocessor import Preprocessor
-from src.python.training.training_pipeline import TrainingPipeline
+from src.python.ingress.ingressor import DataIngressor
+from src.python.training.training_workflow import TrainingWorkflow
 import src.python.utils as utils
 
 if __name__ == "__main__":
@@ -56,18 +57,18 @@ if __name__ == "__main__":
     save_models = True if args.save_models == "True" else False
     use_azure_ml = True if args.use_azure_ml == "True" else False
 
-    config  = utils.load_yaml_config("infrastructure/config.yml")
-    
-    logger = utils.setup_logging(
-        filename="training"
-    )
+    config = utils.load_yaml_config("infrastructure/config.yml")
 
-    mlflow_logger = MLFlowLogger(config, logger, "training", use_azure_ml)
+    logger = utils.setup_logging(filename="training")
+
+    mlflow_logger = MLFlowTracker(config, logger, "training", use_azure_ml)
     aml_utils = AMLUtils(config, mlflow_logger.workspace)
 
-    # run preprocessing:
+    # run data ingress:
+    data_ingressor = DataIngressor(config, logger)
+    data = data_ingressor(location="local")
 
-    data = pd.read_csv("artifacts/data/Housing.csv")
+    # run preprocessing:
     logger.info("Run Preprocess!")
     preprocess_runner = Preprocessor(
         config=config,
@@ -76,14 +77,14 @@ if __name__ == "__main__":
         use_azure_ml=use_azure_ml,
         workspace=mlflow_logger.workspace,
     )
-    data = preprocess_runner.preprocess_data(data = data)
+    data = preprocess_runner.preprocess_data(data=data)
 
     if use_autolog:
         mlflow.sklearn.autolog(log_models=False, log_post_training_metrics=False)
 
     with mlflow.start_run() as run:
         # run training:
-        train_pipeline = TrainingPipeline(
+        train_pipeline = TrainingWorkflow(
             config,
             data=data,
             logger=logger,

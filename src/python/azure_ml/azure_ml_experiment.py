@@ -31,7 +31,7 @@ class AMLExperiment:
     def run(
         self,
         ide: str,
-        runner: str, 
+        runner: str,
         env_version: str,
         use_compute_target: str,
     ) -> None:
@@ -48,7 +48,7 @@ class AMLExperiment:
         - this runner takes another runner and sends it to aml as an experiment
         - things are logged with mlflow inside the runners
         """
-        
+
         runner_dict, runner_name = self._aml_utils.get_runner_details(ide, runner)
 
         # setup aml:

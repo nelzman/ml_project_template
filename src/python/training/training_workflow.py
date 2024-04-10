@@ -21,7 +21,7 @@ from src.python.training.training_utils import TrainingUtils
 from src.python.training.training_visualizer import TrainingVisualizer
 
 
-class TrainingPipeline:
+class TrainingWorkflow:
     def __init__(
         self,
         config: dict,
@@ -109,8 +109,8 @@ class TrainingPipeline:
                 joblib.dump(self._training_results_dict, f)
 
         # save complete model files:
-        if save_trees:     
-            os.makedirs("./artifacts/models/", exist_ok=True)           
+        if save_trees:
+            os.makedirs("./artifacts/models/", exist_ok=True)
             with open("./artifacts/models/housing_model_tree.pkl", "wb") as f:
                 joblib.dump(self.model_tree, f)
 
@@ -161,7 +161,7 @@ class TrainingPipeline:
         for algorithm in algorithms:
             # train model:
             _estimator, _param_grid = self._get_estimator_and_parameters(algorithm)
-            
+
             pipeline = Pipeline(
                 steps=[
                     ("imputer", SimpleImputer(strategy="median")),
@@ -234,7 +234,7 @@ class TrainingPipeline:
         """
         if self._save_files_for_tests:
             filename = f'test_grid_{"ens_" if is_ensemble else ""}.pkl'
-            
+
             with open(f"{self._TEST_PATH}/{filename}", "wb") as f:
                 joblib.dump(grid, f)
             self._logger.info(f"saving model test files for {filename}")

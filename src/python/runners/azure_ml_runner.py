@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
     # load config:
 
-    config  = utils.load_yaml_config("infrastructure/config.yml")
+    config = utils.load_yaml_config("infrastructure/config.yml")
 
     aml_experiment = AMLExperiment(config)
     aml_experiment.run(

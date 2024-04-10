@@ -73,9 +73,7 @@ class AMLUtils:
 
     def _download_dataset_data(self, dataset_name: str, update_data: bool) -> None:
         """
-        :param step: pipeline step: data_ingress or preprocessing
-        :param customer: customer name
-        :param tree_name: which trees to download, read and merge
+        :param dataset_name: dataset to download
         :param update_data: whether to update the local data
         :return: nothing, it downloads .pkl
 
@@ -110,8 +108,6 @@ class AMLUtils:
 
         - download model_tree from registered models in aml
         """
-
-        # TODO: only download when aml-model is newer than the previously downloaded one
 
         registry_prod_models = Model.list(workspace=workspace, name=model_name, tags=[["stage", "Production"]])
         if len(registry_prod_models) == 0:
@@ -181,7 +177,7 @@ class AMLUtils:
         :param file: used runner
         :param local_path: local path to the .run.xml/launch.json
         :param port:
-        :return: customer name, runner-dictionary with run-configuration, runner-name
+        :return: runner-dictionary with run-configuration, runner-name
 
         - constructs a dict with run-configurations based on the .run.xml files for pycharm
         """

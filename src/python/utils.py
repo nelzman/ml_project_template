@@ -6,10 +6,12 @@ import joblib
 import logging
 import datetime as dt
 
+
 def load_yaml_config(config_file):
-    with open(config_file, 'r') as f:
+    with open(config_file, "r") as f:
         return yaml.load(f, Loader=yaml.FullLoader)
-    
+
+
 def load_pickle(
     full_path: str = None,
     filename: str = None,
@@ -25,8 +27,7 @@ def load_pickle(
     return data
 
 
-def setup_logging(filename: str, log_level: int = logging.INFO
-) -> logging.Logger:
+def setup_logging(filename: str, log_level: int = logging.INFO) -> logging.Logger:
     """
     :param filename: file name where log file is saved
     :param log_path: the path under which log file is saved
@@ -83,6 +84,7 @@ def setup_logging(filename: str, log_level: int = logging.INFO
         if os.path.getmtime(os.path.join(logs_path_all, file)) < time_calculated_to_del_log:
             os.remove(os.path.join(logs_path_all, file))
     return logger
+
 
 def load_json(full_path: str, filename: str, mode: str = "r", file_encoding: str = "utf-8") -> dict:
     """

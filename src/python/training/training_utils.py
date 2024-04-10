@@ -12,7 +12,9 @@ class TrainingUtils:
         pass
 
     @staticmethod
-    def z_score_filter_on_target(train_x: pd.DataFrame, train_y: pd.DataFrame, value: int = 2) -> tuple[pd.DataFrame, pd.DataFrame]:
+    def z_score_filter_on_target(
+        train_x: pd.DataFrame, train_y: pd.DataFrame, value: int = 2
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         :param train_x: features to train on
         :param train_y: target to train on
