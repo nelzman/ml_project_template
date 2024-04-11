@@ -1,10 +1,11 @@
-import yaml
+import datetime as dt
+import json
+import logging
 import os
 import time
-import json
+
 import joblib
-import logging
-import datetime as dt
+import yaml
 
 
 def load_yaml_config(config_file):

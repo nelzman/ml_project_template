@@ -1,7 +1,8 @@
-from scipy import stats
 import logging
+
 import numpy as np
 import pandas as pd
+from scipy import stats
 
 
 class Preprocessor:

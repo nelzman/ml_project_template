@@ -16,6 +16,9 @@ export_py_environment:
 remove_py_environment:
 	conda env remove --name ml_project_template
 
+lint:
+	pylint .
+
 isort:
 	isort . -l 130
 
@@ -24,7 +27,8 @@ black:
 
 pr_check:
 	make black
-	pylint .
+	make isort
+	make lint
 
 wheel:
 	python setup.py sdist bdist_wheel egg_info

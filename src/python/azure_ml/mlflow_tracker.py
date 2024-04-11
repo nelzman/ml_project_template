@@ -22,9 +22,7 @@ class MLFlowTracker:
     Class to log run-specific metrics, tags, outputs and artifacts with mlflow usable locally and in aml
     """
 
-    def __init__(
-        self, config: dict, logger: logging.Logger, experiment_name: str, use_azure_ml: bool
-    ) -> None:
+    def __init__(self, config: dict, logger: logging.Logger, experiment_name: str, use_azure_ml: bool) -> None:
         self._config = config
         self._logger = logger
         self._experiment_name = experiment_name
@@ -32,10 +30,13 @@ class MLFlowTracker:
 
         self.workspace = self._setup_mlflow_logging()
 
-    def log_training_runner(self, model_tree: dict,
-                            save_trees: bool = False, 
-                            update_model_registry: bool = False, 
-                            model_name: str = "housing_model_tree") -> None:
+    def log_training_runner(
+        self,
+        model_tree: dict,
+        save_trees: bool = False,
+        update_model_registry: bool = False,
+        model_name: str = "housing_model_tree",
+    ) -> None:
         """
         :param model_tree: dictionary with the models
         :param save_trees: whether to save the trees
@@ -47,16 +48,14 @@ class MLFlowTracker:
         """
         mlflow.set_tags(self._config["training"])
         mlflow.log_artifact(
-            local_path=f"artifacts/logs/"
-            f"training_{self._logger.timestamp}.txt",
+            local_path=f"artifacts/logs/" f"training_{self._logger.timestamp}.txt",
             artifact_path="training_logs",
         )
         best_scores = []
         metrics_dict = {}
 
         mlflow.log_artifact(
-            local_path=f"artifacts/plots/training/"
-            f"training_plots_{self._logger.timestamp}.png",
+            local_path=f"artifacts/plots/training/" f"training_plots_{self._logger.timestamp}.png",
             artifact_path="evaluation_plots",
         )
         acc_dict = {model: abs(model_value.best_score_) for model, model_value in model_tree.items()}
@@ -67,9 +66,7 @@ class MLFlowTracker:
         for model, model_value in model_tree.items():
             metrics_dict[f"score_{model}"] = model_value.best_score_
             metrics_dict[f"mape_{model}"] = model_value.scores_["mean_absolute_percentage_error"]
-            metrics_dict[f"accuracy_{model}"] = (
-                1 - model_value.scores_["mean_absolute_percentage_error"]
-            )
+            metrics_dict[f"accuracy_{model}"] = 1 - model_value.scores_["mean_absolute_percentage_error"]
             metrics_dict[f"rmse_{model}"] = model_value.scores_["root_mean_squared_error"]
         mlflow.log_metrics(metrics_dict)
 
@@ -77,12 +74,9 @@ class MLFlowTracker:
         mlflow.log_metric("overall_score", overall_score)
 
         if self._use_azure_ml and save_trees:
-        
+
             run = mlflow.active_run()
-            model_artifact_path = (
-                f"./artifacts/models/"
-                f"{model_name}.pkl"
-            )
+            model_artifact_path = f"./artifacts/models/" f"{model_name}.pkl"
             aml_artifact_path = f"models/{model_name}"
             model_properties = {"run_id": run.info.run_id, "experiment": self._experiment_name}
             try:
@@ -96,7 +90,7 @@ class MLFlowTracker:
                 "experiment_url": experiment_url,
             }
             mlflow.log_artifact(local_path=model_artifact_path, artifact_path=aml_artifact_path)
-            
+
         if update_model_registry:
             self._logger.info("Registering model with aml-sdk")
             model = Model.register(

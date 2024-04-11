@@ -1,12 +1,11 @@
-import os
 import datetime as dt
 import logging
+import os
 from typing import Callable, Union
-import joblib
 
+import joblib
 import pandas as pd
 from sklearn.ensemble import VotingRegressor
-
 # now you can import normally from sklearn.impute
 from sklearn.impute import SimpleImputer
 from sklearn.metrics import explained_variance_score, make_scorer, r2_score

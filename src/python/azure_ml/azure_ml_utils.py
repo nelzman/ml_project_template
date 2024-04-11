@@ -6,10 +6,10 @@ import warnings
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Union
-import numpy as np
-import pandas as pd
 
 import easygui
+import numpy as np
+import pandas as pd
 import xmltodict
 from azureml.core import Dataset, Environment, Workspace
 from azureml.core.compute import ComputeInstance
@@ -164,7 +164,6 @@ class AMLUtils:
         model.stage = new_stage
         model.update()
         model.add_tags({"stage": new_stage})
-
 
     def get_runner_details(
         self,
