@@ -1,11 +1,9 @@
 import argparse
 import gc
-import os
 
 import mlflow
-import pandas as pd
 
-import src.python.utils as utils
+from src.python import utils
 from src.python.azure_ml.azure_ml_utils import AMLUtils
 from src.python.azure_ml.mlflow_tracker import MLFlowTracker
 from src.python.ingress.ingressor import DataIngressor
@@ -53,10 +51,10 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    save_files_for_tests = True if args.save_files_for_tests == "True" else False
-    use_autolog = True if args.use_autolog == "True" else False
-    save_models = True if args.save_models == "True" else False
-    use_azure_ml = True if args.use_azure_ml == "True" else False
+    save_files_for_tests = args.save_files_for_tests == "True"
+    use_autolog = args.use_autolog == "True"
+    save_models = args.save_models == "True"
+    use_azure_ml = args.use_azure_ml == "True"
 
     config = utils.load_yaml_config("infrastructure/config.yml")
 

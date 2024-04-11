@@ -1,23 +1,15 @@
-import json
 import os
-import re
-import subprocess
 import warnings
 from datetime import datetime, timezone
-from pathlib import Path
-from typing import Union
 
 import easygui
-import numpy as np
-import pandas as pd
 import xmltodict
 from azureml.core import Dataset, Environment, Workspace
 from azureml.core.compute import ComputeInstance
 from azureml.core.model import Model
 from azureml.core.runconfig import DockerConfiguration
-from pyngrok import ngrok
 
-import src.python.utils as utils
+from src.python import utils
 
 
 class AMLUtils:
@@ -75,13 +67,12 @@ class AMLUtils:
         """
         :param dataset_name: dataset to download
         :param update_data: whether to update the local data
-        :return: nothing, it downloads .pkl
 
         - downloads the data from aml datasets if necessary
         """
 
         dataset = Dataset.get_by_name(workspace=self._workspace, name=dataset_name, version="latest")
-        all_campaigns_folder = f"artifacts/aml_data/"
+        all_campaigns_folder = "artifacts/aml_data/"
         local_file = f"{dataset_name}.pkl"
         if os.path.exists(local_file):
             local_file_time = datetime.fromtimestamp(os.path.getmtime(local_file)).replace(tzinfo=timezone.utc)
@@ -112,7 +103,7 @@ class AMLUtils:
         registry_prod_models = Model.list(workspace=workspace, name=model_name, tags=[["stage", "Production"]])
         if len(registry_prod_models) == 0:
             raise FileNotFoundError(f"No Production model for {model_name} found on workspace: {workspace.name}")
-        elif len(registry_prod_models) == 1:
+        if len(registry_prod_models) == 1:
             prod_model = registry_prod_models[0]
         else:
             raise FileNotFoundError(f"Too many Production models for {model_name} found on workspace: {workspace.name}")
@@ -153,14 +144,13 @@ class AMLUtils:
         """
         :param model: model from aml
         :param new_stage: new stage to add to the model
-        :return: None, just sets the stages
 
         - updates aml-model stages if valid model-stages given
         - Production can only be set in the devops model-promotion pipeline
         """
         valid_stages = ["Development", "Staging", "Archived"]
         if new_stage not in valid_stages:
-            ValueError(f"New model stage needs to be one of {valid_stages}")
+            raise ValueError(f"New model stage needs to be one of {valid_stages}")
         model.stage = new_stage
         model.update()
         model.add_tags({"stage": new_stage})
@@ -170,12 +160,11 @@ class AMLUtils:
         ide: str,
         runner: str,
         local_path: str = None,
-    ) -> (str, dict, str):
+    ) -> tuple[str, dict, str]:
         """
         :param ide: used ide
-        :param file: used runner
+        :param runner: used runner
         :param local_path: local path to the .run.xml/launch.json
-        :param port:
         :return: runner-dictionary with run-configuration, runner-name
 
         - constructs a dict with run-configurations based on the .run.xml files for pycharm
@@ -187,9 +176,9 @@ class AMLUtils:
         }
 
         if ide == "pycharm":
-            r_dict = self._get_runner_dict_pycharm(local_path=local_path, aml_params_dict=aml_params)
+            r_dict = self._get_runner_dict_pycharm(aml_params_dict=aml_params, local_path=local_path)
         elif ide == "vscode":
-            r_dict = self._get_runner_dict_vscode(local_path=local_path, aml_params_dict=aml_params)
+            r_dict = self._get_runner_dict_vscode(aml_params_dict=aml_params, local_path=local_path)
         else:
             raise ValueError(f"specified ide {ide} not implemented for this runner")
 
@@ -197,17 +186,17 @@ class AMLUtils:
 
         return r_dict, r_name
 
-    def _get_runner_dict_pycharm(self, local_path: str = None, aml_params_dict: dict = {}) -> dict:
+    def _get_runner_dict_pycharm(self, aml_params_dict: dict, local_path: str = None) -> dict:
         """
-        :param local_path: local path to the .run.xml
         :param aml_params_dict: parameters specifically for aml to be added to the parameters
+        :param local_path: local path to the .run.xml
         :return: dict with run-configurations
 
         - constructs a dict with run-configurations based on the .run.xml files for pycharm
         """
 
         if local_path is None:
-            local_path = f"src/python/.run"
+            local_path = "src/python/.run"
         r_dict = {}
         for file in os.listdir(local_path):
 
@@ -226,8 +215,8 @@ class AMLUtils:
                 if option["@name"] == "PARAMETERS":
                     runner_params = option["@value"]
 
-            runner_param_nested_list = [i.replace('"', "").split("=") for i in runner_params.split('" "')]
-            runner_param_nested_list = [i for i in runner_param_nested_list if i[0] not in aml_params_dict.keys()] + [
+            runner_param_nested_list = [param.replace('"', "").split("=") for param in runner_params.split('" "')]
+            runner_param_nested_list = [key for key in runner_param_nested_list if key[0] not in aml_params_dict] + [
                 [key, value] for key, value in aml_params_dict.items()
             ]
             runner_param_list = [item for sublist in runner_param_nested_list for item in sublist]
@@ -235,10 +224,10 @@ class AMLUtils:
 
         return r_dict
 
-    def _get_runner_dict_vscode(self, local_path: str = None, aml_params_dict: dict = {}) -> dict:
+    def _get_runner_dict_vscode(self, aml_params_dict: dict, local_path: str = None) -> dict:
         """
-        :param local_path: local path to the launch.json
         :param aml_params_dict: parameters specifically for aml to be added to the parameters
+        :param local_path: local path to the launch.json
         :return: dict with run-configurations
 
         - constructs a dict with run-configurations based on the .run.xml files for pycharm
@@ -255,8 +244,8 @@ class AMLUtils:
             r_params = conf["args"]
             r_file = conf["module"].split(".")[-1]
 
-            runner_param_nested_list = [i.replace('"', "").split("=") for i in r_params]
-            runner_param_nested_list = [i for i in runner_param_nested_list if i[0] not in aml_params_dict.keys()] + [
+            runner_param_nested_list = [param.replace('"', "").split("=") for param in r_params]
+            runner_param_nested_list = [key for key in runner_param_nested_list if key[0] not in aml_params_dict.keys()] + [
                 [key, value] for key, value in aml_params_dict.items()
             ]
             runner_param_list = [item for sublist in runner_param_nested_list for item in sublist]

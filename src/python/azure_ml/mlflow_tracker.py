@@ -1,12 +1,10 @@
 import datetime as dt
 import logging
 import os.path
-import re
 import shutil
 
 import mlflow
 import numpy as np
-import pandas as pd
 from azureml.core import Dataset, Model, Workspace
 from azureml.core.authentication import InteractiveLoginAuthentication
 from azureml.core.run import Run
@@ -14,7 +12,6 @@ from azureml.data.datapath import DataPath
 from azureml.exceptions import UserErrorException
 from mlflow.entities import Experiment
 
-from src.python.azure_ml.azure_ml_utils import AMLUtils
 
 
 class MLFlowTracker:
@@ -41,28 +38,28 @@ class MLFlowTracker:
         :param model_tree: dictionary with the models
         :param save_trees: whether to save the trees
         :param update_model_registry: whether to update the model registry
-        :return: None
+        :param model_name: name of the model
 
         - logs tags, params, files, datasets with mlflow
         - uploads models to the registry
         """
         mlflow.set_tags(self._config["training"])
         mlflow.log_artifact(
-            local_path=f"artifacts/logs/" f"training_{self._logger.timestamp}.txt",
+            local_path=f"artifacts/logs/training_{self._logger.timestamp}.txt",
             artifact_path="training_logs",
         )
         best_scores = []
         metrics_dict = {}
 
         mlflow.log_artifact(
-            local_path=f"artifacts/plots/training/" f"training_plots_{self._logger.timestamp}.png",
+            local_path=f"artifacts/plots/training/training_plots_{self._logger.timestamp}.png",
             artifact_path="evaluation_plots",
         )
         acc_dict = {model: abs(model_value.best_score_) for model, model_value in model_tree.items()}
         best_algo = min(acc_dict, key=acc_dict.get)
-        mlflow.set_tags({f"best_algorithm": best_algo})
+        mlflow.set_tags({"best_algorithm": best_algo})
         best_scores.append(acc_dict[best_algo])
-        metrics_dict[f"best_algorithm_score"] = acc_dict[best_algo]
+        metrics_dict["best_algorithm_score"] = acc_dict[best_algo]
         for model, model_value in model_tree.items():
             metrics_dict[f"score_{model}"] = model_value.best_score_
             metrics_dict[f"mape_{model}"] = model_value.scores_["mean_absolute_percentage_error"]
@@ -76,7 +73,7 @@ class MLFlowTracker:
         if self._use_azure_ml and save_trees:
 
             run = mlflow.active_run()
-            model_artifact_path = f"./artifacts/models/" f"{model_name}.pkl"
+            model_artifact_path = f"./artifacts/models/{model_name}.pkl"
             aml_artifact_path = f"models/{model_name}"
             model_properties = {"run_id": run.info.run_id, "experiment": self._experiment_name}
             try:
@@ -140,7 +137,7 @@ class MLFlowTracker:
         - sets the experiment-name
         - deletes local runs older than 20 days to save disk-space
         """
-        tracking_uri = f"artifacts/.mlruns"
+        tracking_uri = "artifacts/.mlruns"
         mlflow.set_tracking_uri(tracking_uri)
         experiment = mlflow.set_experiment(self._experiment_name)
         # delete runs that are older than 7 days
@@ -171,7 +168,6 @@ class MLFlowTracker:
         """
         :param step: step for dataset. one of [data_ingress, preprocess]
         :param tag_dict: dictionary of tags of the step
-        :return: None, saves dataset in aml
 
         - saves datasets for the steps data_ingress and preprocess
         """

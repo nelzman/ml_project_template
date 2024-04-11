@@ -1,6 +1,6 @@
 import argparse
 
-import src.python.utils as utils
+from src.python import utils
 from src.python.azure_ml.azure_ml_experiment import AMLExperiment
 
 if __name__ == "__main__":

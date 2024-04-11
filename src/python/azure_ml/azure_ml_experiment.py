@@ -1,5 +1,3 @@
-import os
-
 from azureml.core import Experiment, ScriptRunConfig, Workspace
 from azureml.core.authentication import InteractiveLoginAuthentication
 from azureml.core.runconfig import RunConfiguration
@@ -36,14 +34,13 @@ class AMLExperiment:
         use_compute_target: str,
     ) -> None:
         """
-        :param file: filepath to run
-        :param args: parameters to run the script
+        :param ide: ide used for development
+        :param runner: runner to run
         :param env_version: version specification. choose from:
             latest: get the latest version
             update: update the environment with your current version
             <version-number>: choose the number by applying a int here
         :param use_compute_target: whether to use the compute target specified in the config or local
-        :return: None
 
         - this runner takes another runner and sends it to aml as an experiment
         - things are logged with mlflow inside the runners
