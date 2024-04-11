@@ -65,7 +65,7 @@ class TrainingVisualizer:
         # self._plot_correlation(axs[2, 2])
 
         # legend:
-        patches = [mpatches.Patch(color=model_color_dict[model], label=model) for model in model_color_dict.keys()]
+        patches = [mpatches.Patch(color=model_color_dict[model], label=model) for model in model_color_dict]
         patches = [mpatches.Patch(color="black", label="Training Data")] + patches
         fig.legend(handles=patches, loc="lower right")
 
@@ -89,7 +89,6 @@ class TrainingVisualizer:
         """
         :param ax: axes for plot
         :param model_color_dict: dictionary with the models and their colors
-        :return: None, adds plot to figure
 
         - plots training-data-rbl and the predictions made by the models
         """
@@ -114,7 +113,6 @@ class TrainingVisualizer:
         """
         :param ax: axes for plot
         :param model_color_dict: dictionary with the models and their colors
-        :return: None, adds plot to figure
 
         - plots training-data-rbl and the predictions made by the models
         """
@@ -139,7 +137,6 @@ class TrainingVisualizer:
         """
         :param ax: axes for plot
         :param model_color_dict: dictionary with the models and their colors
-        :return: None, adds plot to figure
 
         - plots the predicted values against the true values
         """
@@ -158,7 +155,6 @@ class TrainingVisualizer:
         """
         :param ax: axes for plot
         :param model_color_dict: dictionary with the models and their colors
-        :return: None, adds plot to figure
 
         - plots the predicted values against the true values
         """
@@ -177,7 +173,6 @@ class TrainingVisualizer:
         """
         :param ax: axes for plot
         :param model_color_dict: dictionary with the models and their colors
-        :return: None, adds plot to figure
 
         - plots the residuals of the prediction
         """
@@ -196,7 +191,6 @@ class TrainingVisualizer:
         """
         :param ax: axes for plot
         :param model_color_dict: dictionary with the models and their colors
-        :return: None, adds plot to figure
 
         - plots the residuals of the prediction
         """
@@ -215,7 +209,6 @@ class TrainingVisualizer:
         """
         :param ax: axes for plot
         :param names: names of the algorithms
-        :return: None, adds plot to figure
 
         - plots boxplots of the cross-validation-performance of the algorithms
         """
@@ -233,7 +226,6 @@ class TrainingVisualizer:
         """
         :param ax: axes for plot
         :param names: names of the algorithms
-        :return: None, adds plot to figure
 
         - plots boxplots of the cross-validation-performance of the algorithms
         """
@@ -250,7 +242,6 @@ class TrainingVisualizer:
     def _plot_cooks_distance(self, ax: object) -> None:
         """
         :param ax: axes for plot
-        :return: None, adds plot to figure
 
         - plots the cooks-distance, an indicator of how influencial each sample is
         """
@@ -271,7 +262,6 @@ class TrainingVisualizer:
         """
         :param ax: axes for plot
         :param model_color_dict: dictionary with the models and their colors
-        :return: None, adds plot to figure
 
         - plots the feature importance for the models
         """
@@ -288,7 +278,6 @@ class TrainingVisualizer:
     def _plot_correlation(self, ax: object) -> None:
         """
         :param ax: axes for plot
-        :return: None, adds plot to figure
 
         - plots the correlation of the features to the rbl
         - orders them by the feature-order of the plot_feature_importance-method
@@ -310,7 +299,6 @@ class TrainingVisualizer:
     def _plot_diagonal_line(self, ax: object) -> None:
         """
         :param ax: axes for plot
-        :return: None, adds plot to figure
 
         # plots diagonal line
         """

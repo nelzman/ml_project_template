@@ -1,7 +1,9 @@
+from __future__ import annotations
+
+import collections.abc as collection
 import datetime as dt
 import logging
 import os
-from typing import Callable, Union
 
 import joblib
 import pandas as pd
@@ -33,7 +35,7 @@ class TrainingWorkflow:
         self._logger = logger
         self._train_preparation = TrainingPreparation(config=self._config, logger=self._logger)
         self._save_files_for_tests = save_files_for_tests
-        self._TEST_PATH = f"src/python/test/unit/test_training/test_files/"
+        self._TEST_PATH = "src/python/test/unit/test_training/test_files/"
         self._evaluate_metric = self._config["training"]["evaluate_metric"]
         self.model_tree = {}
         self._training_results_dict = {}
@@ -41,7 +43,7 @@ class TrainingWorkflow:
 
     def train(
         self,
-        algorithms: Union[str, list] = ["XGBRegressor"],
+        algorithms: str | list = "XGBRegressor",
         ensemble_weights: list = None,
         plot_results: bool = True,
         save_trees: bool = False,
@@ -80,7 +82,7 @@ class TrainingWorkflow:
         ) = self._train_preparation.construct_training_data(self._data, [])
 
         self._logger.info("----------------------------------------------------------")
-        self._logger.info(f"training:")
+        self._logger.info("training:")
 
         # train for different algorithms
         self.model_tree = self._train_models(
@@ -122,7 +124,7 @@ class TrainingWorkflow:
 
     def _train_models(
         self,
-        algorithms: Union[str, list],
+        algorithms: str | list,
         x_train: pd.DataFrame,
         y_train: list,
         x_test: pd.DataFrame,
@@ -137,6 +139,7 @@ class TrainingWorkflow:
         :param x_test: features of the test-set
         :param y_test: target of the test-set
         :param ensemble_weights: weights for the ensemble-estimator
+        :param used_features: list of features used for training
         :return: bool whether training was successfull. Model-Results get saved to self.model_tree
 
         - training of in config specified models
@@ -229,7 +232,6 @@ class TrainingWorkflow:
         """
         :param grid: model object
         :param is_ensemble: if the model is an ensemble model this parameter should be set to True for correct filename def
-        :return:
         """
         if self._save_files_for_tests:
             filename = f'test_grid_{"ens_" if is_ensemble else ""}.pkl'
@@ -238,7 +240,7 @@ class TrainingWorkflow:
                 joblib.dump(grid, f)
             self._logger.info(f"saving model test files for {filename}")
 
-    def _get_estimator_and_parameters(self, algorithm: str, prefix: str = "model__") -> tuple[Callable, dict]:
+    def _get_estimator_and_parameters(self, algorithm: str, prefix: str = "model__") -> tuple[collection.Callable, dict]:
         """
         :param algorithm: algorithm to use
         :param prefix: prefix for the model name

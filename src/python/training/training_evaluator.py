@@ -116,6 +116,6 @@ class TrainingEvaluator:
                 continue
 
         if not best_models:
-            ValueError(f"Choosen scoring model with name {config['scoring']['use_algorithm']} not found!")
+            raise ValueError(f"Choosen scoring model with name {config['scoring']['use_algorithm']} not found!")
 
         return best_models

@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 import numpy as np
 import pandas as pd
@@ -16,8 +16,8 @@ class MetricGenerator:
 
     def __init__(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         count_param_coeffs: int = None,
         train_obs: int = None,
     ) -> None:
@@ -62,17 +62,16 @@ class MetricGenerator:
 
         if time_horizon is None:
             return 0
-        elif time_horizon < 0:
+        if time_horizon < 0:
             raise ValueError("time_horizon can not be negative")
-        elif time_horizon > len(self.y_pred):
+        if time_horizon > len(self.y_pred):
             raise ValueError("time_horizon can not be larger than number of predictions")
-        else:
-            return len(self.y_true) - time_horizon
+        return len(self.y_true) - time_horizon
 
     def calculate_r2_score(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
     ) -> float:
         """
@@ -97,8 +96,8 @@ class MetricGenerator:
 
     def calculate_adjusted_r2_score(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
     ) -> float:
         """
@@ -125,8 +124,8 @@ class MetricGenerator:
 
     def calculate_mean_squared_error(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
     ) -> float:
         """
@@ -152,8 +151,8 @@ class MetricGenerator:
 
     def calculate_root_mean_squared_error(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
     ) -> float:
         """
@@ -178,8 +177,8 @@ class MetricGenerator:
 
     def calculate_norm_root_mean_squared_error(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
         normalize_method: str = None,
     ) -> float:
@@ -223,8 +222,8 @@ class MetricGenerator:
 
     def calculate_explained_variance_score(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
     ) -> float:
         """
@@ -249,8 +248,8 @@ class MetricGenerator:
 
     def calculate_delta_standard_deviation(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
     ) -> float:
         """
@@ -276,8 +275,8 @@ class MetricGenerator:
 
     def calculate_delta_relative_standard_deviation(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
     ) -> float:
         """
@@ -304,8 +303,8 @@ class MetricGenerator:
 
     def calculate_mean_absolute_percentage_error(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
     ) -> float:
         """
@@ -330,8 +329,8 @@ class MetricGenerator:
 
     def calculate_regional_accuracy(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
         region: float = 0.2,
         calc_type: str = "start",
@@ -368,15 +367,15 @@ class MetricGenerator:
                 y_pred_th[i] / y_true_th[i] - 1 if y_true_th[i] != 0 else y_pred_th[i] / (y_true_th[i] + 0.01) - 1
                 for i in range(len(y_true_th))
             ]
-            metric = [1 if (value >= -region) and (value <= region) else 0 for value in metric]
+            metric = [1 if -region <= value <= region else 0 for value in metric]
         self.regional_accuracy = np.sum(metric) / len(self.y_true)
 
         return self.regional_accuracy
 
     def calculate_all_metrics(
         self,
-        y_true: Union[np.array, list] = None,
-        y_pred: Union[np.array, list] = None,
+        y_true: np.array | list = None,
+        y_pred: np.array | list = None,
         time_horizon: int = None,
     ) -> dict:
         """
@@ -413,7 +412,7 @@ class MetricGenerator:
 
         return self.metric_dict
 
-    def calculate_delta_metrics(self, y_true: Union[np.array, list] = None, y_pred: Union[np.array, list] = None) -> dict:
+    def calculate_delta_metrics(self, y_true: np.array | list = None, y_pred: np.array | list = None) -> dict:
         """
         :param y_true: the ground-truth to compare the prediction to
         :param y_pred: prediction to calculate the metrics for
@@ -449,5 +448,4 @@ class MetricGenerator:
             }
 
             return self.delta_metric_dict
-        else:
-            return {}
+        return {}

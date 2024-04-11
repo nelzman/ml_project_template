@@ -11,10 +11,11 @@ class TrainingPreparation:
         self._logger = logger
 
     def construct_training_data(
-        self, data: pd.DataFrame, columns: list = []
+        self, data: pd.DataFrame, columns: list = None
     ) -> tuple[pd.DataFrame, pd.Series, pd.DataFrame, pd.Series, list]:
         """
-        :param datasets: datasets to construct train-test data
+        :param data: data to construct train-test data
+        :param columns: columns to use for training
         :return: a tuple with (training_x, training_y, test_x, test_y, preselected columns, cross-validation-settings)
 
         - split the data into training and test-data
@@ -51,11 +52,12 @@ class TrainingPreparation:
         return x_train, y_train, x_test, y_test
 
     def _get_pre_selected_columns(
-        self, x_train: pd.DataFrame, x_test: pd.DataFrame, columns: list = []
+        self, x_train: pd.DataFrame, x_test: pd.DataFrame, columns: list = None
     ) -> tuple[pd.DataFrame, pd.DataFrame, list]:
         """
         :param x_train: training-dataframe with features
         :param x_test: test-dataframe with features
+        :param columns: columns to use for training
         :return: training and testing dataframe and the preselected columns
 
         - get dataframes with preselected columns

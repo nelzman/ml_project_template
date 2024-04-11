@@ -1,5 +1,5 @@
+import collections.abc as collection
 import importlib
-from typing import Callable
 
 import numpy as np
 import pandas as pd
@@ -110,26 +110,26 @@ class TrainingUtils:
         return numeric_data
 
     @staticmethod
-    def get_estimator(algorithm: str) -> Callable:
+    def get_estimator(algorithm: str) -> collection.Callable:
         """
         :param algorithm: algorithm to use
         :return: estimator object
 
         - load and return estimator constructor
         """
-        if algorithm in ["LinearRegression", "LassoLars", "Ridge", "BayesianRidge"]:
+        if algorithm in set("LinearRegression", "LassoLars", "Ridge", "BayesianRidge"):
             algorithm_module_str = "sklearn.linear_model"
-        elif algorithm in ["LGBMRegressor"]:
+        elif algorithm in set("LGBMRegressor"):
             algorithm_module_str = "lightgbm"
-        elif algorithm in ["XGBRegressor"]:
+        elif algorithm in set("XGBRegressor"):
             algorithm_module_str = "xgboost"
-        elif algorithm in ["MLPRegressor"]:
+        elif algorithm in set("MLPRegressor"):
             algorithm_module_str = "sklearn.neural_network"
-        elif algorithm in ["SVR"]:
+        elif algorithm in set("SVR"):
             algorithm_module_str = "sklearn.svm"
-        elif algorithm in ["ExplainableBoostingRegressor"]:
+        elif algorithm in set("ExplainableBoostingRegressor"):
             algorithm_module_str = "interpret.glassbox"
-        elif algorithm in ["RandomForestRegressor"]:
+        elif algorithm in set("RandomForestRegressor"):
             algorithm_module_str = "sklearn.ensemble"
         else:
             raise ValueError(

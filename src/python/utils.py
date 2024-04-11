@@ -8,8 +8,14 @@ import joblib
 import yaml
 
 
-def load_yaml_config(config_file):
-    with open(config_file, "r") as f:
+def load_yaml_config(config_file: str) -> dict:
+    """
+    :param config_file: path to the yaml file
+    :return: dictionary of configuration
+
+    - load configuration from yaml file
+    """
+    with open(config_file, "r", encoding="utf-8") as f:
         return yaml.load(f, Loader=yaml.FullLoader)
 
 
@@ -31,8 +37,6 @@ def load_pickle(
 def setup_logging(filename: str, log_level: int = logging.INFO) -> logging.Logger:
     """
     :param filename: file name where log file is saved
-    :param log_path: the path under which log file is saved
-    :param host_log_path: the path in hosts where log file is stored per request
     :param log_level: log level to be used by the logger [logging.DEBUG, .INFO, .WARN, .ERROR or .CRITICAL]
     :return: logging.Logger
 
