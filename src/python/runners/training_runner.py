@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
     # run data ingress:
     data_ingressor = DataIngressor(config, logger)
-    data = data_ingressor(location="local")
+    data = data_ingressor.ingress(location="local")
 
     # run preprocessing:
     logger.info("Run Preprocess!")
