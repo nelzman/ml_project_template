@@ -35,7 +35,7 @@ class TrainingWorkflow:
         self._logger = logger
         self._train_preparation = TrainingPreparation(config=self._config, logger=self._logger)
         self._save_files_for_tests = save_files_for_tests
-        self._TEST_PATH = "src/python/test/unit/test_training/test_files/"
+        self._TEST_PATH = "test/unit/test_training/test_files/"
         self._evaluate_metric = self._config["training"]["evaluate_metric"]
         self.model_tree = {}
         self._training_results_dict = {}

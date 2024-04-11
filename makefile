@@ -31,13 +31,13 @@ pr_check:
 	make lint
 
 wheel:
-	python setup.py sdist bdist_wheel egg_info
+	python -m build . --wheel
 
 unit_tests:
-	pytest src/python/test/unit -vv
+	pytest tests/unit -vv
 
 unit_tests_cov:
-	pytest src/python/test/unit -vv --cov-config=.coveragerc --cov-report term-missing --cov=src
+	pytest tests/unit -vv --cov-config=.coveragerc --cov-report term-missing --cov=src
 
 mlflow_ui:
 	mlflow ui --backend-store-uri artifacts/.mlruns --port 5001
