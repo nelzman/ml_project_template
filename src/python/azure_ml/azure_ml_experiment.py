@@ -3,6 +3,7 @@ from azureml.core.authentication import InteractiveLoginAuthentication
 from azureml.core.runconfig import RunConfiguration
 
 from src.python.azure_ml.azure_ml_utils import AMLUtils
+from src.python.runners.runner_utils import RunnerUtils
 
 
 class AMLExperiment:
@@ -25,6 +26,7 @@ class AMLExperiment:
             auth=credentials,
         )
         self._aml_utils = AMLUtils(self._config, self._workspace)
+        self._runner_utils = RunnerUtils(self._config)
 
     def run(
         self,
@@ -46,7 +48,7 @@ class AMLExperiment:
         - things are logged with mlflow inside the runners
         """
 
-        runner_dict, runner_name = self._aml_utils.get_runner_details(ide, runner)
+        runner_dict, runner_name = self._runner_utils.get_runner_details(ide, runner)
 
         # setup aml:
 
