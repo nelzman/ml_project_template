@@ -4,6 +4,15 @@ azure_ml:
   resource_group: tbd
   workspace_name: tbd
   compute_target: tbd
+aws:
+  region: tbd
+  bucket: tbd
+  role: tbd
+  instance_type: tbd
+  instance_count: tbd
+  endpoint_name: tbd
+  endpoint_instance_type: tbd
+  endpoint_instance_count: tbd
 training:
   target: price
   algorithms: [LinearRegression, XGBRegressor]
