@@ -1,9 +1,9 @@
 azure_ml:
-  subscription_id: 795c1886-4507-4661-ac84-4ebfadb51ef9
-  tenant_id: 6fcdf11d-9d5a-4142-8e42-a6226cda73da
-  resource_group: ML-Demos
-  workspace_name: azure_ml_demos
-  compute_target: cpu-cluster-light
+  subscription_id: tbd
+  tenant_id: tbd
+  resource_group: tbd
+  workspace_name: tbd
+  compute_target: tbd
 training:
   target: price
   algorithms: [LinearRegression, XGBRegressor]
