@@ -4,6 +4,7 @@ import pandas as pd
 
 
 class DataIngressor:
+    
     def __init__(self, config: dict, logger: logging.Logger) -> None:
         self._config = config
         self._logger = logger

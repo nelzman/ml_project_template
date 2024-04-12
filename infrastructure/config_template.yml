@@ -1,0 +1,39 @@
+azure_ml:
+  subscription_id: tbd
+  tenant_id: tbd
+  resource_group: tbd
+  workspace_name: tbd
+  compute_target: tbd
+training:
+  target: price
+  algorithms: [LinearRegression, XGBRegressor]
+  ensemble_weights: null
+  evaluate_metric: mean_absolute_percentage_error        
+  cv_folds: 5
+  test_size: 0.2
+  plotting_params:
+    alpha: 0.3
+    s: 2
+  model_parameters:
+    LinearRegression: 
+      fit_intercept: [false, true]
+    LassoLars: 
+      fit_intercept: [false, true]
+      alpha: [0.001, 0.002, 0.005, 0.01, 0.02, 0.1, 0.2]
+    Ridge:
+      alpha: [0.1, 0.05, 0.01,0.5,0.8]
+      fit_intercept: [false, true]
+      solver: ["auto","svd","lsqr"]
+    XGBRegressor: 
+      max_depth: [4]
+      n_estimators: [200]
+      learning_rate: [0.3]
+      objective: ["reg:squarederror"]
+      gamma: [0.01]
+      booster: ["gbtree"]
+      subsample: [1]
+      min_child_weight: [2]
+      colsample_bytree: [0.6]
+      reg_alpha: [0]
+      reg_lambda: [2]
+      importance_type: ["gain"]
