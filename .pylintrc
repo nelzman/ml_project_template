@@ -108,6 +108,7 @@ disable=
     cyclic-import,
     import-error,
     broad-exception-caught,
+    unsubscriptable-object
 
 
 [REPORTS]

@@ -17,7 +17,7 @@ remove_py_environment:
 	conda env remove --name ml_project_template
 
 lint:
-	pylint ./src/python
+	pylint ./src/python --rcfile=.pylintrc
 
 isort:
 	isort . -l 130
